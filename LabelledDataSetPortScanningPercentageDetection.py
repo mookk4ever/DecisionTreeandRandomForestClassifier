@@ -1,6 +1,5 @@
 import pandas as pd
 
-# Assuming your data is stored in a CSV file named 'data.csv'
 file_path = '/Users/jerry/Documents/Assignment/Dados_Deolindo/dataset_7.csv'
 data = pd.read_csv(file_path)
 
