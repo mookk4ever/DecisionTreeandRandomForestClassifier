@@ -1,41 +1,20 @@
 import pandas as pd
-from collections import defaultdict
 
-# Function to calculate suspected port scanning activity
-def detect_port_scanning(data, packet_threshold=100, unique_ip_threshold=5):
-    # Initialize dictionaries to store packet counts and unique destination IPs for each source IP
-    packet_counts = defaultdict(int)
-    unique_ips = defaultdict(set)
-    suspected_ips = set()
+# Assuming your data is stored in a CSV file named 'data.csv'
+file_path = '/Users/jerry/Documents/Assignment/Dados_Deolindo/dataset_7.csv'
+data = pd.read_csv(file_path)
 
-    # Iterate over each row in the dataframe
-    for index, row in data.iterrows():
-        # Extract relevant information
-        source_ip = row['Source IP']
-        destination_ip = row['Destination IP']
+# Check if 'Label' column exists
+if ' Label' in data.columns:
+    # Count total entries under the 'Label' column
+    total_entries = len(data)
 
-        # Update packet counts and unique destination IPs for the source IP
-        packet_counts[source_ip] += 1
-        unique_ips[source_ip].add(destination_ip)
+    # Count the number of PortScan entries under the 'Label' column
+    total_portscan = (data[' Label'] == 'PortScan').sum()
 
-    # Check if the packet count or unique destination IP count exceeds the threshold for each source IP
-    for source_ip in packet_counts:
-        if packet_counts[source_ip] > packet_threshold or len(unique_ips[source_ip]) > unique_ip_threshold:
-            suspected_ips.add(source_ip)
+    # Calculate percentage
+    percentage_portscan = (total_portscan / total_entries) * 100
 
-    # Add a new column to indicate suspected port scanning activity
-    data['Suspected Port Scanning'] = data['Source IP'].apply(lambda x: 1 if x in suspected_ips else 0)
-
-    return data
-
-# Read your dataset CSV file
-data = pd.read_csv('/Users/jerry/Documents/Assignment/Dados_Deolindo/Testsetgood.csv')
-
-# Call the function to detect suspected port scanning activity
-data_with_detection = detect_port_scanning(data)
-
-# Calculate the percentage of suspected port scanning activity in the dataset
-percent_suspected = (data_with_detection['Suspected Port Scanning'].sum() / len(data_with_detection)) * 100
-
-# Print the percentage of suspected port scanning activity
-print("Percentage of Suspected Port Scanning Activity: {:.2f}%".format(percent_suspected))
+    print("Percentage of PortScan to total under label: {:.2f}%".format(percentage_portscan))
+else:
+    print("The 'Label' column does not exist in the dataset.")
